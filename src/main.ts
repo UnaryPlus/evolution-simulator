@@ -22,7 +22,8 @@ const MAXR_MUTATION_STD = 5
 const ATTRACT_MUTATION_PROB = 0.2
 const ATTRACT_MUTATION_STD = 0.1
 
-const 
+const DEL_MUTATION_PROB = 0.05
+const ADD_MUTATION_PROB = 0.05
 
 type Force = {
   minRadius:number,
@@ -112,10 +113,20 @@ class Creature {
   }
 
   static mutate(p:p5, cr:Creature) : Creature {
-    const particles = map(cr.particles, (pt:Particle) =>
+    const particles = cr.particles.map((pt:Particle) =>
       mutateParticle(p, pt)
-    })
-
+    )
+    if(p.random() < DEL_MUTATION_PROB) {
+      const index = p.floor(p.random(particles.length))
+      particles.splice(index, 1)
+      particles.forEach((pt:Particle) => pt.forces.splice(index, 1))
+    }
+    if(p.random() < ADD_MUTATION_PROB) {
+      const newPt = randomParticle(p, particles.length + 1)
+      particles.forEach((pt:Particle) => pt.forces.push(randomForce(p)))
+      particles.push(newPt)
+    }
+    return new Creature(particles)
   }
 
   reset() : void {
@@ -169,16 +180,36 @@ class Creature {
     }
     return this.fitness(p)
   }
+
+  display(p:p5, x:number, y:number) : void {
+    this.trialParticles.forEach((pt:Particle) => {
+      p.fill(0)
+      p.circle(pt.pos.x + x, pt.pos.y + y, 8)
+    })
+  }
 }
 
 function sketch(p:p5) {
+  let creature:Creature
+
   p.setup = function() : void {
-    const creature = Creature.random(p)
-    console.log("trial: " + creature.trial(p))
+    const canvas = p.createCanvas(800, 600)
+    canvas.parent('game')
+    canvas.style('border', '1px solid black')
+    canvas.elt.onselectstart = () => false
+
+    creature = Creature.random(p)
   }
 
   p.draw = function() : void {
-
+    p.background(255)
+    if(p.frameCount < 600) {
+      creature.update(p)
+      creature.display(p, 100, 100)
+    }
+    else if(p.frameCount === 600) {
+      console.log('fitness: ', creature.fitness(p))
+    }
   }
 }
 
