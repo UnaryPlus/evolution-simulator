@@ -241,8 +241,12 @@ function getStatistics(p:p5, creatures:Creature[]) : Statistics {
   }
 }
 
+type Action = 'sort' | 'filter'
+
 function sketch(p:p5) {
   let creatures:Creature[]
+  let button:p5.Element
+  let action:Action
 
   p.setup = function() : void {
     const canvas = p.createCanvas(800, 610)
@@ -255,8 +259,25 @@ function sketch(p:p5) {
       creatures.push(Creature.random(p, i))
     }
 
+    button = p.createButton("Sort by fitness")
+    button.position(620, 400)
+    button.mouseClicked(buttonClicked)
+    action = 'sort'
+
     drawGrid()
     drawStatistics()
+  }
+
+  function buttonClicked() : void {
+    if(action === 'sort') {
+      creatures.sort((cr1:Creature, cr2:Creature) => cr2.fitness - cr1.fitness)
+      drawGrid()
+      button.value('Filter population')
+      action = 'filter'
+    }
+    if(action === 'filter') {
+      
+    }
   }
 
   function drawGrid() : void {
@@ -280,8 +301,10 @@ function sketch(p:p5) {
     const st = getStatistics(p, creatures)
     p.fill(0)
     p.noStroke()
+    p.textSize(16)
+    p.text('Generation 0', 610, 25)
+    p.textSize(12)
     p.text(stripIndent`
-      Generation 0
       mean fitness: ${st.meanFitness.toFixed(2)}
       min fitness: ${st.minFitness.toFixed(2)}
       max fitness: ${st.maxFitness.toFixed(2)}
@@ -289,7 +312,7 @@ function sketch(p:p5) {
       mean min force radius: ${st.meanMinRadius.toFixed(2)}
       mean max force radius: ${st.meanMaxRadius.toFixed(2)}
       mean attraction: ${st.meanAttraction.toFixed(2)}
-      `, 610, 20)
+      `, 610, 47)
   }
 
   p.draw = function() : void {
@@ -302,12 +325,14 @@ function sketch(p:p5) {
       const cr = creatures[i * 10 + j]
       p.fill(0)
       p.noStroke()
+      p.textSize(12)
       p.text(stripIndent`
         domain: ${cr.domain}
         fitness: ${cr.fitness.toFixed(2)}
         number of particles: ${cr.particles.length}
         `, 610, 160)
     }
+
 
   }
 }
