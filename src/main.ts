@@ -4,8 +4,7 @@ import p5 from 'p5'
 const FRICTION = 0.01
 const MIN_PARTICLES = 3
 const MAX_PARTICLES = 10
-const CR_WIDTH = 100
-const CR_HEIGHT = 100
+const CR_SIZE = 100
 const MIN_MINR = 15
 const MAX_MINR = 30
 const MIN_MAXR = 30
@@ -64,7 +63,7 @@ type Particle = {
 
 function randomParticle(p:p5, n:number) : Particle {
   return {
-    pos : p.createVector(p.random(CR_WIDTH), p.random(CR_HEIGHT)),
+    pos : p.createVector(p.random(CR_SIZE), p.random(CR_SIZE)),
     vel : p.createVector(0, 0),
     forces : Array.from({ length:n }, () => randomForce(p))
   }
@@ -82,8 +81,8 @@ function findCenter(p:p5, particles:Particle[]) : p5.Vector {
 function mutatePos(p:p5, pos:p5.Vector) : p5.Vector {
   if(p.random() < POS_MUTATION_PROB) {
     return p.createVector(
-      p.randomGaussian(pos.x, POS_MUTATION_STD),
-      p.randomGaussian(pos.y, POS_MUTATION_STD)
+      p.constrain(p.randomGaussian(pos.x, POS_MUTATION_STD), 0, CR_SIZE),
+      p.constrain(p.randomGaussian(pos.y, POS_MUTATION_STD), 0, CR_SIZE)
     )
   }
   return pos
@@ -99,17 +98,23 @@ function mutateParticle(p:p5, pt:Particle) : Particle {
 
 class Creature {
   readonly particles:Particle[]
+  readonly fitness:number
   trialParticles:Particle[]
 
-  constructor(particles:Particle[]) {
+  constructor(p:p5, particles:Particle[]) {
     this.particles = particles
     this.trialParticles = clone(particles)
+    for(let i = 0; i < 600; i++) {
+      this.update(p)
+    }
+    this.fitness = this.currentFitness(p)
+    this.reset()
   }
 
   static random(p:p5) : Creature {
     const n = p.floor(p.random(MIN_PARTICLES, MAX_PARTICLES + 1))
     const particles:Particle[] = Array.from({ length:n }, () => randomParticle(p, n))
-    return new Creature(particles)
+    return new Creature(p, particles)
   }
 
   static mutate(p:p5, cr:Creature) : Creature {
@@ -126,7 +131,7 @@ class Creature {
       particles.forEach((pt:Particle) => pt.forces.push(randomForce(p)))
       particles.push(newPt)
     }
-    return new Creature(particles)
+    return new Creature(p, particles)
   }
 
   reset() : void {
@@ -159,7 +164,7 @@ class Creature {
     }
   }
 
-  fitness(p:p5) : number {
+  currentFitness(p:p5) : number {
     const oldCenter = findCenter(p, this.particles)
     const newCenter = findCenter(p, this.trialParticles)
     const dir = p5.Vector.sub(newCenter, oldCenter)
@@ -173,42 +178,55 @@ class Creature {
     return minDist
   }
 
-  trial(p:p5) : number {
-    this.reset()
-    for(let i = 0; i < 600; i++) {
-      this.update(p)
-    }
-    return this.fitness(p)
-  }
-
-  display(p:p5, x:number, y:number) : void {
+  display(p:p5, x:number, y:number, size:number) : void {
+    const scale = size / CR_SIZE
     this.trialParticles.forEach((pt:Particle) => {
       p.fill(0)
-      p.circle(pt.pos.x + x, pt.pos.y + y, 8)
+      p.circle(pt.pos.x * scale + x, pt.pos.y * scale + y, 8 * scale)
     })
   }
 }
 
+type Statistics = {
+  medianFitness:number,
+  minFitness:number,
+  maxFitness:number,
+  meanParticles:number,
+  meanMinRadius:number,
+  meanMaxRadius:number,
+  meanAttraction:number
+}
+
+function getStatistics(Creature[]) : Statisticss {
+  
+}
+
 function sketch(p:p5) {
-  let creature:Creature
+  let creatures:Creature[]
 
   p.setup = function() : void {
-    const canvas = p.createCanvas(800, 600)
+    const canvas = p.createCanvas(800, 610)
     canvas.parent('game')
     canvas.style('border', '1px solid black')
     canvas.elt.onselectstart = () => false
 
-    creature = Creature.random(p)
+    creatures = []
+    for(let i = 0; i < 100; i++) {
+      creatures.push(Creature.random(p))
+    }
   }
 
-  p.draw = function() : void {
-    p.background(255)
-    if(p.frameCount < 600) {
-      creature.update(p)
-      creature.display(p, 100, 100)
-    }
-    else if(p.frameCount === 600) {
-      console.log('fitness: ', creature.fitness(p))
+  function drawMain() : void {
+    for(let i = 0; i < 10; i++) {
+      for(let j = 0; j < 10; j++) {
+        const x = j * 60 + 10
+        const y = i * 60 + 10
+        p.noFill()
+        p.stroke(0)
+        p.rect(x, y, 50, 50)
+        const cr = creatures[i * 10 + j]
+        cr.display(p, x + 5, y + 5, 40)
+      }
     }
   }
 }
