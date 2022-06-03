@@ -3,6 +3,8 @@ import { stripIndent } from 'common-tags'
 import p5 from 'p5'
 
 const FRICTION = 0.01
+const PARTICLE_ADVANTAGE = 0
+
 const MIN_PARTICLES = 4
 const MAX_PARTICLES = 10
 const CR_SIZE = 100
@@ -170,6 +172,12 @@ class Creature {
   currentFitness(p:p5) : number {
     const oldCenter = findCenter(p, this.particles)
     const newCenter = findCenter(p, this.trialParticles)
+    const advantage = this.particles.length * PARTICLE_ADVANTAGE
+    return p5.Vector.dist(oldCenter, newCenter) + advantage
+    /*
+    // OLD ALGORITHM
+    const oldCenter = findCenter(p, this.particles)
+    const newCenter = findCenter(p, this.trialParticles)
     const dir = p5.Vector.sub(newCenter, oldCenter)
     dir.normalize()
     let minDist = Infinity
@@ -179,6 +187,7 @@ class Creature {
       minDist = p.min(minDist, dist)
     }
     return minDist
+    */
   }
 
   display(p:p5, x:number, y:number, size:number, deleted:boolean) : void {
