@@ -10,11 +10,11 @@ function setInstance(instance:p5) : void {
 
 const env = {
   friction:0.01,
-  massPower:1
+  massPower:2
 }
 
 const gen = {
-  minParticles:4,
+  minParticles:3,
   maxParticles:10,
   creatureSize:100,
   minRadiusMin:15,
@@ -26,14 +26,14 @@ const gen = {
 }
 
 const mut = {
-  positionProb:0.2,
+  positionProb:0.1,
   positionStd:3,
-  minRadiusProb:0.2,
+  minRadiusProb:0.05,
   minRadiusStd:3,
-  maxRadiusProb:0.2,
+  maxRadiusProb:0.05,
   maxRadiusStd:5,
-  attractionProb:0.2,
+  attractionProb:0.05,
   attractionStd:0.1,
   deletionProb:0.05,
-  additionProb:0.02
+  additionProb:0.05
 }

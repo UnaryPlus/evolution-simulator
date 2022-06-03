@@ -10,7 +10,8 @@ function sketch(instance:p5) {
 
   let creatures:Creature[]
   let deleted:boolean[]
-  let button:p5.Element
+  let mainButton:p5.Element
+  let backButton:p5.Element
   let action:Action
   let zoomed:Creature|null = null
   let generation:number = 0
@@ -19,6 +20,7 @@ function sketch(instance:p5) {
     const canvas = p.createCanvas(800, 610)
     canvas.parent('game')
     canvas.style('border', '1px solid black')
+    canvas.mouseClicked(canvasClicked)
     canvas.elt.onselectstart = () => false
 
     creatures = []
@@ -28,10 +30,17 @@ function sketch(instance:p5) {
 
     deleted = Array.from({ length:100 }, () => false)
 
-    button = p.createButton("Sort by fitness")
-    button.position(620, 300)
-    button.mouseClicked(buttonClicked)
+    mainButton = p.createButton("Sort by fitness")
+    mainButton.position(620, 300)
+    mainButton.mouseClicked(mainClicked)
+    mainButton.elt.onselectstart = () => false
     action = 'sort'
+
+    backButton = p.createButton("←")
+    backButton.position(20, 20)
+    backButton.mouseClicked(backClicked)
+    backButton.elt.onselectstart = () => false
+    backButton.hide()
 
     drawGrid(creatures, deleted)
     drawHeading(generation, action)
@@ -47,36 +56,48 @@ function sketch(instance:p5) {
     }
   }
 
-  p.mouseClicked = function() : void {
+  function canvasClicked() : void {
     if(zoomed === null) {
       zoomed = getCreature(creatures)
       if(zoomed !== null) {
-        button.hide()
+        mainButton.hide()
+        backButton.show()
       }
     }
   }
 
-  function buttonClicked() : void {
+  function mainClicked() : void {
     if(action === 'sort') {
       sortByFitness(creatures)
-      button.html('Filter population')
+      mainButton.html('Filter population')
       action = 'filter'
     }
     else if(action === 'filter') {
       deleted = filterGradient(creatures)
-      button.html('Create offspring')
+      mainButton.html('Create offspring')
       action = 'create'
     }
     else if(action === 'create') {
       creatures = createOffspring(creatures, deleted)
       deleted = Array.from({ length:100 }, () => false)
       generation += 1
-      button.html('Sort by fitness')
+      mainButton.html('Sort by fitness')
       action = 'sort'
       drawStatistics(creatures)
     }
     drawGrid(creatures, deleted)
     drawHeading(generation, action)
+  }
+
+  function backClicked() : void {
+    if(zoomed !== null) zoomed.reset()
+    zoomed = null
+    backButton.hide()
+    mainButton.show()
+    p.background(255)
+    drawGrid(creatures, deleted)
+    drawHeading(generation, action)
+    drawStatistics(creatures)
   }
 }
 

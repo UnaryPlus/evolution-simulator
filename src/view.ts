@@ -131,10 +131,10 @@ function drawCreatureData(creatures:Creature[]) : void {
 function drawCreature(cr:Creature) : void {
   p.background(255)
   p.stroke(225)
-  for(let x = 0; x < p.width; x += 30) {
+  for(let x = 10; x < p.width; x += 30) {
     p.line(x, 0, x, p.height)
   }
-  for(let y = 0; y < p.width; y += 30) {
+  for(let y = 20; y < p.width; y += 30) {
     p.line(0, y, p.width, y)
   }
   cr.display(p.width / 2, p.height / 2, gen.creatureSize, false)

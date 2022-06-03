@@ -9,15 +9,17 @@ export default class Creature {
   readonly domain:number
   readonly fitness:number
   trialParticles:Particle[]
+  interactions:number
 
   constructor(particles:Particle[], domain:number) {
     this.particles = particles
     this.domain = domain
     this.trialParticles = clone(particles)
+    this.interactions = 0
     for(let i = 0; i < 600; i++) {
       this.update()
     }
-    this.fitness = this.currentFitness()
+    this.fitness = this.interactions / this.particles.length ** env.massPower
     this.reset()
   }
 
@@ -45,6 +47,7 @@ export default class Creature {
 
   reset() : void {
     this.trialParticles = clone(this.particles)
+    this.interactions = 0
   }
 
   update() : void {
@@ -58,6 +61,7 @@ export default class Creature {
         const force = pt.forces[j]
         const dist = p5.Vector.sub(pt2.pos, pt.pos)
         if(dist.mag() > force.minRadius && dist.mag() < force.maxRadius) {
+          this.interactions += 1
           dist.setMag(force.attraction)
           acc.add(dist)
         }
@@ -71,22 +75,6 @@ export default class Creature {
       pt.vel.mult(1 - env.friction)
       pt.pos.add(pt.vel)
     }
-  }
-
-  currentFitness() : number {
-    const sum = p.createVector(0, 0)
-    for(let i = 0; i < this.particles.length; i++) {
-      sum.add(p5.Vector.sub(this.trialParticles[i].pos, this.particles[i].pos))
-    }
-    return sum.mag()
-
-
-    /*
-    const oldCenter = findCenter(this.particles)
-    const newCenter = findCenter(this.trialParticles)
-    const dist = p5.Vector.dist(oldCenter, newCenter)
-    return dist * this.particles.length ** env.massPower
-    */
   }
 
   display(x:number, y:number, size:number, deleted:boolean) : void {
