@@ -1,17 +1,18 @@
 import p5 from 'p5'
 
-import { p } from './global'
+import { p, setInstance } from './global'
 import Creature from './creature'
-import { drawGrid, drawHeading, drawStatistics, drawCreatureData } from './view'
+import { drawGrid, drawHeading, drawStatistics, getCreature, drawCreatureData, drawCreature } from './view'
 import { Action, sortByFitness, filterGradient, createOffspring } from './action'
 
 function sketch(instance:p5) {
-  p = instance
+  setInstance(instance)
 
   let creatures:Creature[]
   let deleted:boolean[]
   let button:p5.Element
   let action:Action
+  let zoomed:Creature|null = null
   let generation:number = 0
 
   p.setup = function() : void {
@@ -38,12 +39,26 @@ function sketch(instance:p5) {
   }
 
   p.draw = function() : void {
-    drawCreatureData(creatures)
+    if(zoomed === null) {
+      drawCreatureData(creatures)
+    }
+    else {
+      drawCreature(zoomed)
+    }
+  }
+
+  p.mouseClicked = function() : void {
+    if(zoomed === null) {
+      zoomed = getCreature(creatures)
+      if(zoomed !== null) {
+        button.hide()
+      }
+    }
   }
 
   function buttonClicked() : void {
     if(action === 'sort') {
-      creatures.sort((cr1:Creature, cr2:Creature) => cr2.fitness - cr1.fitness)
+      sortByFitness(creatures)
       button.html('Filter population')
       action = 'filter'
     }

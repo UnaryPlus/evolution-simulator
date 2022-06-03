@@ -1,8 +1,12 @@
-export { p, env, gen, mut }
+export { p, setInstance, env, gen, mut }
 
 import p5 from 'p5'
 
 let p:p5
+
+function setInstance(instance:p5) : void {
+  p = instance
+}
 
 const env = {
   friction:0.01,

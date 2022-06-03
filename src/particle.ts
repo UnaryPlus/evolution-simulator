@@ -1,3 +1,5 @@
+export { Particle, randomForce, randomParticle, mutateParticle }
+
 import p5 from 'p5'
 
 import { p, gen, mut } from './global'
@@ -63,11 +65,4 @@ function mutateParticle(pt:Particle) : Particle {
     vel : p.createVector(0, 0),
     forces : pt.forces.map((f:Force) => mutateForce(f))
   }
-}
-
-function findCenter(particles:Particle[]) : p5.Vector {
-  const avg = p.createVector(0, 0)
-  particles.forEach((pt:Particle) => avg.add(pt.pos))
-  avg.div(particles.length)
-  return avg
 }

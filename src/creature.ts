@@ -1,6 +1,8 @@
 import clone from 'clone'
+import p5 from 'p5'
 
-import { p } from './global'
+import { p, env, gen, mut } from './global'
+import { Particle, randomForce, randomParticle, mutateParticle } from './particle'
 
 export default class Creature {
   readonly particles:Particle[]
@@ -27,7 +29,7 @@ export default class Creature {
 
   static mutate(cr:Creature) : Creature {
     const particles = cr.particles.map((pt:Particle) =>
-      mutateParticle(p, pt))
+      mutateParticle(pt))
     if(p.random() < mut.deletionProb && particles.length > gen.minParticles) {
       const index = p.floor(p.random(particles.length))
       particles.splice(index, 1)
@@ -70,37 +72,21 @@ export default class Creature {
       pt.pos.add(pt.vel)
     }
   }
-  update(p:p5) : void {
-    const accelerations:p5.Vector[] = []
-    for(let i = 0; i < this.trialParticles.length; i++) {
-      const pt = this.trialParticles[i]
-      const acc = p.createVector(0, 0)
-      for(let j = 0; j < this.trialParticles.length; j++) {
-        if(i === j) continue
-        const pt2 = this.trialParticles[j]
-        const force = pt.forces[j]
-        const dist = p5.Vector.sub(pt2.pos, pt.pos)
-        if(dist.mag() > force.minRadius && dist.mag() < force.maxRadius) {
-            dist.setMag(force.attraction)
-            acc.add(dist)
-        }
-      }
-      accelerations.push(acc)
-    }
-
-    for(let i = 0; i < this.trialParticles.length; i++) {
-      const pt = this.trialParticles[i]
-      pt.vel.add(accelerations[i])
-      pt.vel.mult(1 - env.friction)
-      pt.pos.add(pt.vel)
-    }
-  }
 
   currentFitness() : number {
+    const sum = p.createVector(0, 0)
+    for(let i = 0; i < this.particles.length; i++) {
+      sum.add(p5.Vector.sub(this.trialParticles[i].pos, this.particles[i].pos))
+    }
+    return sum.mag()
+
+
+    /*
     const oldCenter = findCenter(this.particles)
     const newCenter = findCenter(this.trialParticles)
     const dist = p5.Vector.dist(oldCenter, newCenter)
     return dist * this.particles.length ** env.massPower
+    */
   }
 
   display(x:number, y:number, size:number, deleted:boolean) : void {

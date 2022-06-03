@@ -1,10 +1,11 @@
 export { Action, sortByFitness, filterGradient, createOffspring }
 
 import { p } from './global'
+import Creature from './creature'
 
 type Action = 'sort' | 'filter' | 'create'
 
-function sortByFitness(creatures:Creatures) : void {
+function sortByFitness(creatures:Creature[]) : void {
   creatures.sort((cr1:Creature, cr2:Creature) => cr2.fitness - cr1.fitness)
 }
 
