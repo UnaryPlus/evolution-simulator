@@ -3,7 +3,7 @@ import { stripIndent } from 'common-tags'
 import p5 from 'p5'
 
 const FRICTION = 0.01
-const MIN_PARTICLES = 3
+const MIN_PARTICLES = 4
 const MAX_PARTICLES = 10
 const CR_SIZE = 100
 const MIN_MINR = 15
@@ -124,12 +124,12 @@ class Creature {
     const particles = cr.particles.map((pt:Particle) =>
       mutateParticle(p, pt)
     )
-    if(p.random() < DEL_MUTATION_PROB) {
+    if(p.random() < DEL_MUTATION_PROB && particles.length > MIN_PARTICLES) {
       const index = p.floor(p.random(particles.length))
       particles.splice(index, 1)
       particles.forEach((pt:Particle) => pt.forces.splice(index, 1))
     }
-    if(p.random() < ADD_MUTATION_PROB) {
+    if(p.random() < ADD_MUTATION_PROB && particles.length < MAX_PARTICLES) {
       const newPt = randomParticle(p, particles.length + 1)
       particles.forEach((pt:Particle) => pt.forces.push(randomForce(p)))
       particles.push(newPt)
@@ -181,10 +181,10 @@ class Creature {
     return minDist
   }
 
-  display(p:p5, x:number, y:number, size:number) : void {
+  display(p:p5, x:number, y:number, size:number, deleted:boolean) : void {
     const scale = size / CR_SIZE
     this.trialParticles.forEach((pt:Particle) => {
-      p.fill(0)
+      p.fill(deleted ? 225 : 0)
       p.noStroke()
       p.circle(pt.pos.x * scale + x, pt.pos.y * scale + y, 10 * scale)
     })
@@ -241,12 +241,37 @@ function getStatistics(p:p5, creatures:Creature[]) : Statistics {
   }
 }
 
-type Action = 'sort' | 'filter'
+function filterGradient(p:p5, creatures:Creature[]) : boolean[] {
+  const deleted:boolean[] = []
+  for(let i = 0; i < creatures.length; i++) {
+    const prob = p.map(i, 0, creatures.length - 1, 0, 1)
+    deleted.push(p.random() < prob)
+  }
+  return deleted
+}
+
+function createOffspring(p:p5, creatures:Creature[], deleted:boolean[]) : Creature[] {
+  const offspring:Creature[] = []
+  while(true) {
+    for(let i = 0; i < creatures.length; i++) {
+      if(!deleted[i]) {
+        offspring.push(Creature.mutate(p, creatures[i]))
+        if(offspring.length === creatures.length) {
+          return offspring
+        }
+      }
+    }
+  }
+}
+
+type Action = 'sort' | 'filter' | 'mutate'
 
 function sketch(p:p5) {
   let creatures:Creature[]
+  let deleted:boolean[]
   let button:p5.Element
   let action:Action
+  let generation:number = 0
 
   p.setup = function() : void {
     const canvas = p.createCanvas(800, 610)
@@ -258,6 +283,8 @@ function sketch(p:p5) {
     for(let i = 0; i < 100; i++) {
       creatures.push(Creature.random(p, i))
     }
+
+    deleted = Array.from({ length:100 }, () => false)
 
     button = p.createButton("Sort by fitness")
     button.position(620, 400)
@@ -271,12 +298,26 @@ function sketch(p:p5) {
   function buttonClicked() : void {
     if(action === 'sort') {
       creatures.sort((cr1:Creature, cr2:Creature) => cr2.fitness - cr1.fitness)
-      drawGrid()
-      button.value('Filter population')
+      button.html('Filter population')
       action = 'filter'
+      drawGrid()
+      drawStatistics()
     }
-    if(action === 'filter') {
-      
+    else if(action === 'filter') {
+      deleted = filterGradient(p, creatures)
+      button.html('Create offspring')
+      action = 'mutate'
+      drawGrid()
+      drawStatistics()
+    }
+    else if(action === 'mutate') {
+      creatures = createOffspring(p, creatures, deleted)
+      deleted = Array.from({ length:100 }, () => false)
+      generation += 1
+      button.html('Sort by fitness')
+      action = 'sort'
+      drawGrid()
+      drawStatistics()
     }
   }
 
@@ -286,23 +327,31 @@ function sketch(p:p5) {
     p.rect(0, 0, 605, 610)
     for(let i = 0; i < 10; i++) {
       for(let j = 0; j < 10; j++) {
+        const cr = creatures[i * 10 + j]
+        const del = deleted[i * 10 + j]
         const x = j * 60 + 10
         const y = i * 60 + 10
         p.noFill()
-        p.stroke(0)
+        p.stroke(del ? 225 : 0)
         p.rect(x, y, 50, 50)
-        const cr = creatures[i * 10 + j]
-        cr.display(p, x + 5, y + 5, 40)
+        cr.display(p, x + 5, y + 5, 40, del)
       }
     }
   }
 
   function drawStatistics() : void {
     const st = getStatistics(p, creatures)
+    p.fill(255)
+    p.noStroke()
+    p.rect(605, 5, 190, 135)
     p.fill(0)
     p.noStroke()
     p.textSize(16)
-    p.text('Generation 0', 610, 25)
+    const state:string =
+      action === 'sort' ? ''
+      : action === 'filter' ? ' (sorted)'
+      : ' (filtered)'
+    p.text('Generation ' + generation + state, 610, 25)
     p.textSize(12)
     p.text(stripIndent`
       mean fitness: ${st.meanFitness.toFixed(2)}
@@ -332,8 +381,6 @@ function sketch(p:p5) {
         number of particles: ${cr.particles.length}
         `, 610, 160)
     }
-
-
   }
 }
 
