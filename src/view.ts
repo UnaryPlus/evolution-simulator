@@ -55,20 +55,33 @@ function getStatistics(creatures:Creature[]) : Statistics {
   }
 }
 
-function drawGrid(p:p5, creatures:Creature[], deleted:boolean[]) : void {
+function drawGrid(p:p5, creatures:Creature[], deleted:boolean[], phylum:string|number) : void {
+  const phy:number =
+      phylum === '' ? -1
+    : isNaN(+phylum) ? -1
+    : +phylum
   p.fill(255)
   p.noStroke()
   p.rect(0, 0, 605, 610)
   for(let i = 0; i < 10; i++) {
     for(let j = 0; j < 10; j++) {
       const cr = creatures[i * 10 + j]
-      const del = deleted[i * 10 + j]
+      const dead = deleted[i * 10 + j]
+      const searched = cr.phylum === phy
+      const color =
+          dead && searched ? p.color(255, 225, 225)
+        : dead ? p.color(225, 225, 225)
+        : searched ? p.color(255, 0, 0)
+        : p.color(0, 0, 0)
       const x = j * 60 + 10
       const y = i * 60 + 10
       p.noFill()
-      p.stroke(del ? 225 : 0)
+      p.stroke(color)
+      p.strokeWeight(searched ? 2 : 1)
       p.rect(x, y, 50, 50)
-      cr.display(p, x + 5, y + 5, 40, del)
+      p.fill(color)
+      p.noStroke()
+      cr.display(p, x + 5, y + 5, 40)
     }
   }
 }
@@ -141,6 +154,8 @@ function drawCreature(p:p5, cr:Creature) : void {
   }
   const x = p.width / 2 - gen.creatureSize / 2
   const y = p.height / 2 - gen.creatureSize / 2
-  cr.display(p, x, y, gen.creatureSize, false)
+  p.fill(0)
+  p.noStroke()
+  cr.display(p, x, y, gen.creatureSize)
   cr.update()
 }

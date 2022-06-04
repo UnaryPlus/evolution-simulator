@@ -90,11 +90,9 @@ export default class Creature {
     }
   }
 
-  display(p:p5, x:number, y:number, size:number, deleted:boolean) : void {
+  display(p:p5, x:number, y:number, size:number) : void {
     const scale = size / gen.creatureSize
     this.trialParticles.forEach((pt:Particle) => {
-      p.fill(deleted ? 225 : 0)
-      p.noStroke()
       p.circle(pt.pos.x * scale + x, pt.pos.y * scale + y, 10 * scale)
     })
   }

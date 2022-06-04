@@ -1,4 +1,4 @@
-export { Action, sortByFitness, filterGradient, createOffspring }
+export { Action, sortByFitness, filterGradient, killPhylum, createOffspring }
 
 import Creature from './creature'
 
@@ -15,6 +15,23 @@ function filterGradient(creatures:Creature[]) : boolean[] {
     deleted.push(Math.random() < prob)
   }
   return deleted
+}
+
+function killPhylum(creatures:Creature[], phylum:string|number) : null|boolean[] {
+  const phy:number =
+      phylum === '' ? -1
+    : isNaN(+phylum) ? -1
+    : +phylum
+  const deleted:boolean[] = []
+  let hasFalse = false
+  let hasTrue = false
+  creatures.forEach((cr:Creature) => {
+    if(cr.phylum === phy) hasTrue = true
+    else hasFalse = true
+    deleted.push(cr.phylum === phy)
+  })
+  if(hasFalse && hasTrue) return deleted
+  return null
 }
 
 function createOffspring(creatures:Creature[], deleted:boolean[]) : Creature[] {

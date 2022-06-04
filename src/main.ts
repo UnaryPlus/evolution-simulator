@@ -2,7 +2,7 @@ import p5 from 'p5'
 
 import Creature from './creature'
 import { drawGrid, drawHeading, drawStatistics, getCreature, drawCreatureData, drawCreature } from './view'
-import { Action, sortByFitness, filterGradient, createOffspring } from './action'
+import { Action, sortByFitness, filterGradient, killPhylum, createOffspring } from './action'
 
 function sketch(p:p5) {
   let creatures:Creature[]
@@ -12,10 +12,20 @@ function sketch(p:p5) {
   let skipButton:p5.Element
   let backButton:p5.Element
   let resetButton:p5.Element
+  let killButton:p5.Element
+  let phylumSearch:p5.Element
 
   let action:Action
   let zoomed:Creature|null = null
   let generation:number = 0
+
+  function createButton(text:string, x:number, y:number, callback : () => void) : p5.Element{
+    const button = p.createButton(text)
+    button.position(x, y)
+    button.mouseClicked(callback)
+    button.elt.onselectstart = () => false
+    return button
+  }
 
   p.setup = function() : void {
     const canvas = p.createCanvas(800, 610)
@@ -28,33 +38,22 @@ function sketch(p:p5) {
     for(let i = 0; i < 100; i++) {
       creatures.push(Creature.random())
     }
-
     deleted = Array.from({ length:100 }, () => false)
 
-    mainButton = p.createButton("Sort by fitness")
-    mainButton.position(620, 300)
-    mainButton.mouseClicked(mainClicked)
-    mainButton.elt.onselectstart = () => false
+    mainButton = createButton("Sort by fitness", 620, 300, mainClicked)
+    skipButton = createButton("Skip 10 generations", 620, 340, skipClicked)
+    killButton = createButton("Mass extinction", 620, 340, killClicked).hide()
+    backButton = createButton("Back", 20, 20, backClicked).hide()
+    resetButton = createButton("Reset", 75, 20, resetClicked).hide()
+
+    phylumSearch = p.createInput("", "number")
+    phylumSearch.position(620, 380)
+    // @ts-ignore
+    phylumSearch.input(() => drawGrid(p, creatures, deleted, phylumSearch.value()))
+    phylumSearch.elt.placeholder = "Phylum"
+
     action = 'sort'
-
-    skipButton = p.createButton("Skip 10 generations")
-    skipButton.position(620, 350)
-    skipButton.mouseClicked(skipClicked)
-    skipButton.elt.onselectstart = () => false
-
-    backButton = p.createButton("Back")
-    backButton.position(20, 20)
-    backButton.mouseClicked(backClicked)
-    backButton.elt.onselectstart = () => false
-    backButton.hide()
-
-    resetButton = p.createButton("Reset")
-    resetButton.position(75, 20)
-    resetButton.mouseClicked(resetClicked)
-    resetButton.elt.onselectstart = () => false
-    resetButton.hide()
-
-    drawGrid(p, creatures, deleted)
+    drawGrid(p, creatures, deleted, phylumSearch.value())
     drawHeading(p, generation, action)
     drawStatistics(p, creatures)
   }
@@ -74,6 +73,8 @@ function sketch(p:p5) {
       if(zoomed !== null) {
         mainButton.hide()
         skipButton.hide()
+        killButton.hide()
+        phylumSearch.hide()
         backButton.show()
         resetButton.show()
       }
@@ -84,11 +85,13 @@ function sketch(p:p5) {
     if(action === 'sort') {
       sortByFitness(creatures)
       skipButton.hide()
+      killButton.show()
       mainButton.html('Filter population')
       action = 'filter'
     }
     else if(action === 'filter') {
       deleted = filterGradient(creatures)
+      killButton.hide()
       mainButton.html('Create offspring')
       action = 'create'
     }
@@ -101,7 +104,7 @@ function sketch(p:p5) {
       action = 'sort'
       drawStatistics(p, creatures)
     }
-    drawGrid(p, creatures, deleted)
+    drawGrid(p, creatures, deleted, phylumSearch.value())
     drawHeading(p, generation, action)
   }
 
@@ -113,9 +116,21 @@ function sketch(p:p5) {
       deleted = Array.from({ length:100 }, () => false)
     }
     generation += 10
-    drawGrid(p, creatures, deleted)
+    drawGrid(p, creatures, deleted, phylumSearch.value())
     drawHeading(p, generation, action)
     drawStatistics(p, creatures)
+  }
+
+  function killClicked() : void {
+    const del = killPhylum(creatures, phylumSearch.value())
+    if(del !== null) {
+      deleted = del
+      killButton.hide()
+      mainButton.html('Create offspring')
+      action = 'create'
+    }
+    drawGrid(p, creatures, deleted, phylumSearch.value())
+    drawHeading(p, generation, action)
   }
 
   function backClicked() : void {
@@ -124,9 +139,11 @@ function sketch(p:p5) {
     backButton.hide()
     resetButton.hide()
     mainButton.show()
+    phylumSearch.show()
     if(action === 'sort') skipButton.show()
+    if(action === 'filter') killButton.show()
     p.background(255)
-    drawGrid(p, creatures, deleted)
+    drawGrid(p, creatures, deleted, phylumSearch.value())
     drawHeading(p, generation, action)
     drawStatistics(p, creatures)
   }

@@ -2,7 +2,7 @@ export { env, gen, mut, random, randomInt, randomGaussian, constrain }
 
 const env = {
   friction:0.01,
-  massPower:1.9,
+  massPower:1.85,
   trialTime:600
 }
 
