@@ -6,14 +6,14 @@ import { Particle, randomForce, randomParticle, mutateParticle } from './particl
 
 export default class Creature {
   readonly particles:Particle[]
-  readonly domain:number
+  readonly species:number
   readonly fitness:number
   trialParticles:Particle[]
   interactions:number
 
-  constructor(particles:Particle[], domain:number) {
+  constructor(particles:Particle[], species:number) {
     this.particles = particles
-    this.domain = domain
+    this.species = species
     this.trialParticles = clone(particles)
     this.interactions = 0
     for(let i = 0; i < 600; i++) {
@@ -23,10 +23,10 @@ export default class Creature {
     this.reset()
   }
 
-  static random(domain:number) : Creature {
+  static random(species:number) : Creature {
     const n = p.floor(p.random(gen.minParticles, gen.maxParticles + 1))
     const particles:Particle[] = Array.from({ length:n }, () => randomParticle(n))
-    return new Creature(particles, domain)
+    return new Creature(particles, species)
   }
 
   static mutate(cr:Creature) : Creature {
@@ -42,7 +42,7 @@ export default class Creature {
       particles.forEach((pt:Particle) => pt.forces.push(randomForce()))
       particles.push(newPt)
     }
-    return new Creature(particles, cr.domain)
+    return new Creature(particles, cr.species)
   }
 
   reset() : void {

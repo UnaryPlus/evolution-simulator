@@ -121,7 +121,7 @@ function drawCreatureData(creatures:Creature[]) : void {
     p.fill(0)
     p.textSize(12)
     p.text(stripIndent`
-      domain: ${cr.domain}
+      species: ${cr.species}
       fitness: ${cr.fitness.toFixed(2)}
       number of particles: ${cr.particles.length}
       `, 610, 160)
