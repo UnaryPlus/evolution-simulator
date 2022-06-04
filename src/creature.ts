@@ -4,45 +4,58 @@ import p5 from 'p5'
 import { p, env, gen, mut } from './global'
 import { Particle, randomForce, randomParticle, mutateParticle } from './particle'
 
+const next = {
+  domain:0,
+  phylum:0
+}
+
 export default class Creature {
   readonly particles:Particle[]
-  readonly species:number
+  readonly domain:number
+  readonly phylum:number
   readonly fitness:number
   trialParticles:Particle[]
   interactions:number
 
-  constructor(particles:Particle[], species:number) {
+  constructor(particles:Particle[], domain:number, phylum:number) {
     this.particles = particles
-    this.species = species
+    this.domain = domain
+    this.phylum = phylum
     this.trialParticles = clone(particles)
     this.interactions = 0
-    for(let i = 0; i < 600; i++) {
+    for(let i = 0; i < env.trialTime; i++) {
       this.update()
     }
     this.fitness = this.interactions / this.particles.length ** env.massPower
     this.reset()
   }
 
-  static random(species:number) : Creature {
+  static random() : Creature {
     const n = p.floor(p.random(gen.minParticles, gen.maxParticles + 1))
     const particles:Particle[] = Array.from({ length:n }, () => randomParticle(n))
-    return new Creature(particles, species)
+    const domain = next.domain++
+    const phylum = next.phylum++
+    return new Creature(particles, domain, phylum)
   }
 
   static mutate(cr:Creature) : Creature {
     const particles = cr.particles.map((pt:Particle) =>
       mutateParticle(pt))
+    let newPhylum = false
     if(p.random() < mut.deletionProb && particles.length > gen.minParticles) {
       const index = p.floor(p.random(particles.length))
       particles.splice(index, 1)
       particles.forEach((pt:Particle) => pt.forces.splice(index, 1))
+      newPhylum = true
     }
     if(p.random() < mut.additionProb && particles.length < gen.maxParticles) {
       const newPt = randomParticle(particles.length + 1)
       particles.forEach((pt:Particle) => pt.forces.push(randomForce()))
       particles.push(newPt)
+      newPhylum = true
     }
-    return new Creature(particles, cr.species)
+    const phylum = newPhylum ? next.phylum++ : cr.phylum
+    return new Creature(particles, cr.domain, phylum)
   }
 
   reset() : void {

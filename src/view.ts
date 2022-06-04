@@ -115,13 +115,14 @@ function getCreature(creatures:Creature[]) : Creature|null {
 function drawCreatureData(creatures:Creature[]) : void {
   p.fill(255)
   p.noStroke()
-  p.rect(605, 145, 190, 60)
+  p.rect(605, 145, 190, 70)
   const cr = getCreature(creatures)
   if(cr !== null) {
     p.fill(0)
     p.textSize(12)
     p.text(stripIndent`
-      species: ${cr.species}
+      domain: ${cr.domain}
+      phylum: ${cr.phylum}
       fitness: ${cr.fitness.toFixed(2)}
       number of particles: ${cr.particles.length}
       `, 610, 160)

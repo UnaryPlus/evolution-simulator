@@ -29,7 +29,7 @@ function sketch(instance:p5) {
 
     creatures = []
     for(let i = 0; i < 100; i++) {
-      creatures.push(Creature.random(i))
+      creatures.push(Creature.random())
     }
 
     deleted = Array.from({ length:100 }, () => false)
