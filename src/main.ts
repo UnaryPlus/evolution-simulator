@@ -1,13 +1,10 @@
 import p5 from 'p5'
 
-import { p, setInstance } from './global'
 import Creature from './creature'
 import { drawGrid, drawHeading, drawStatistics, getCreature, drawCreatureData, drawCreature } from './view'
 import { Action, sortByFitness, filterGradient, createOffspring } from './action'
 
-function sketch(instance:p5) {
-  setInstance(instance)
-
+function sketch(p:p5) {
   let creatures:Creature[]
   let deleted:boolean[]
 
@@ -57,23 +54,23 @@ function sketch(instance:p5) {
     resetButton.elt.onselectstart = () => false
     resetButton.hide()
 
-    drawGrid(creatures, deleted)
-    drawHeading(generation, action)
-    drawStatistics(creatures)
+    drawGrid(p, creatures, deleted)
+    drawHeading(p, generation, action)
+    drawStatistics(p, creatures)
   }
 
   p.draw = function() : void {
     if(zoomed === null) {
-      drawCreatureData(creatures)
+      drawCreatureData(p, creatures)
     }
     else {
-      drawCreature(zoomed)
+      drawCreature(p, zoomed)
     }
   }
 
   function canvasClicked() : void {
     if(zoomed === null) {
-      zoomed = getCreature(creatures)
+      zoomed = getCreature(p, creatures)
       if(zoomed !== null) {
         mainButton.hide()
         skipButton.hide()
@@ -102,10 +99,10 @@ function sketch(instance:p5) {
       skipButton.show()
       mainButton.html('Sort by fitness')
       action = 'sort'
-      drawStatistics(creatures)
+      drawStatistics(p, creatures)
     }
-    drawGrid(creatures, deleted)
-    drawHeading(generation, action)
+    drawGrid(p, creatures, deleted)
+    drawHeading(p, generation, action)
   }
 
   function skipClicked() : void {
@@ -116,9 +113,9 @@ function sketch(instance:p5) {
       deleted = Array.from({ length:100 }, () => false)
     }
     generation += 10
-    drawGrid(creatures, deleted)
-    drawHeading(generation, action)
-    drawStatistics(creatures)
+    drawGrid(p, creatures, deleted)
+    drawHeading(p, generation, action)
+    drawStatistics(p, creatures)
   }
 
   function backClicked() : void {
@@ -129,9 +126,9 @@ function sketch(instance:p5) {
     mainButton.show()
     if(action === 'sort') skipButton.show()
     p.background(255)
-    drawGrid(creatures, deleted)
-    drawHeading(generation, action)
-    drawStatistics(creatures)
+    drawGrid(p, creatures, deleted)
+    drawHeading(p, generation, action)
+    drawStatistics(p, creatures)
   }
 
   function resetClicked() : void {

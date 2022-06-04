@@ -2,7 +2,7 @@ export { Particle, randomForce, randomParticle, mutateParticle }
 
 import p5 from 'p5'
 
-import { p, gen, mut } from './global'
+import { gen, mut, random, randomGaussian, constrain } from './global'
 
 type Force = {
   minRadius:number,
@@ -18,42 +18,42 @@ type Particle = {
 
 function randomForce() : Force {
   return {
-    minRadius : p.random(gen.minRadiusMin, gen.minRadiusMax),
-    maxRadius : p.random(gen.maxRadiusMin, gen.maxRadiusMax),
-    attraction : p.randomGaussian(gen.attractionMean, gen.attractionStd)
+    minRadius : random(gen.minRadiusMin, gen.minRadiusMax),
+    maxRadius : random(gen.maxRadiusMin, gen.maxRadiusMax),
+    attraction : randomGaussian(gen.attractionMean, gen.attractionStd)
   }
 }
 
 function randomParticle(n:number) : Particle {
   return {
-    pos : p.createVector(p.random(gen.creatureSize), p.random(gen.creatureSize)),
-    vel : p.createVector(0, 0),
+    pos : new p5.Vector(random(0, gen.creatureSize), random(0, gen.creatureSize)),
+    vel : new p5.Vector(0, 0),
     forces : Array.from({ length:n }, () => randomForce())
   }
 }
 
 function mutateForce(force:Force) : Force {
-  const minRadius = p.random() < mut.minRadiusProb
-    ? p.randomGaussian(force.minRadius, mut.minRadiusStd)
+  const minRadius = Math.random() < mut.minRadiusProb
+    ? randomGaussian(force.minRadius, mut.minRadiusStd)
     : force.minRadius
-  const maxRadius = p.random() < mut.maxRadiusProb
-    ? p.randomGaussian(force.maxRadius, mut.maxRadiusStd)
+  const maxRadius = Math.random() < mut.maxRadiusProb
+    ? randomGaussian(force.maxRadius, mut.maxRadiusStd)
     : force.maxRadius
-  const attraction = p.random() < mut.attractionProb
-    ? p.randomGaussian(force.attraction, mut.attractionStd)
+  const attraction = Math.random() < mut.attractionProb
+    ? randomGaussian(force.attraction, mut.attractionStd)
     : force.attraction
   return {
-    minRadius : p.constrain(minRadius, gen.minRadiusMin, gen.minRadiusMax),
-    maxRadius : p.constrain(maxRadius, gen.maxRadiusMin, gen.maxRadiusMax),
+    minRadius : constrain(minRadius, gen.minRadiusMin, gen.minRadiusMax),
+    maxRadius : constrain(maxRadius, gen.maxRadiusMin, gen.maxRadiusMax),
     attraction : attraction
   }
 }
 
 function mutatePos(pos:p5.Vector) : p5.Vector {
-  if(p.random() < mut.positionProb) {
-    return p.createVector(
-      p.constrain(p.randomGaussian(pos.x, mut.positionStd), 0, gen.creatureSize),
-      p.constrain(p.randomGaussian(pos.y, mut.positionStd), 0, gen.creatureSize)
+  if(Math.random() < mut.positionProb) {
+    return new p5.Vector(
+      constrain(randomGaussian(pos.x, mut.positionStd), 0, gen.creatureSize),
+      constrain(randomGaussian(pos.y, mut.positionStd), 0, gen.creatureSize)
     )
   }
   return pos
@@ -62,7 +62,7 @@ function mutatePos(pos:p5.Vector) : p5.Vector {
 function mutateParticle(pt:Particle) : Particle {
   return {
     pos : mutatePos(pt.pos),
-    vel : p.createVector(0, 0),
+    vel : new p5.Vector(0, 0),
     forces : pt.forces.map((f:Force) => mutateForce(f))
   }
 }

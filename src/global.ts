@@ -1,12 +1,4 @@
-export { p, setInstance, env, gen, mut }
-
-import p5 from 'p5'
-
-let p:p5
-
-function setInstance(instance:p5) : void {
-  p = instance
-}
+export { env, gen, mut, random, randomInt, randomGaussian, constrain }
 
 const env = {
   friction:0.01,
@@ -37,4 +29,20 @@ const mut = {
   attractionStd:0.1,
   deletionProb:0.05,
   additionProb:0.05
+}
+
+function random(min:number, max:number) : number {
+  return Math.random() * (max - min) + min
+}
+
+function randomInt(min:number, max:number) : number {
+  return Math.floor(random(min, max))
+}
+
+function randomGaussian(mean:number, std:number) : number {
+  return Math.sqrt(-2 * Math.log(1 - Math.random())) * Math.cos(2.0 * Math.PI * Math.random()) * std + mean
+}
+
+function constrain(x:number, min:number, max:number) : number {
+  return x < min ? min : x > max ? max : x
 }

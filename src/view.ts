@@ -1,8 +1,9 @@
 export { drawGrid, drawHeading, drawStatistics, getCreature, drawCreatureData, drawCreature }
 
 import { stripIndent } from 'common-tags'
+import p5 from 'p5'
 
-import { p, gen } from './global'
+import { gen, constrain } from './global'
 import Creature from './creature'
 import { Action } from './action'
 
@@ -23,8 +24,8 @@ function getStatistics(creatures:Creature[]) : Statistics {
   let totalParticles = 0
   creatures.forEach((cr:Creature) => {
     sumFitness += cr.fitness
-    minFitness = p.min(minFitness, cr.fitness)
-    maxFitness = p.max(maxFitness, cr.fitness)
+    minFitness = Math.min(minFitness, cr.fitness)
+    maxFitness = Math.max(maxFitness, cr.fitness)
     totalParticles += cr.particles.length
   })
   let sumMinRadius = 0
@@ -54,7 +55,7 @@ function getStatistics(creatures:Creature[]) : Statistics {
   }
 }
 
-function drawGrid(creatures:Creature[], deleted:boolean[]) : void {
+function drawGrid(p:p5, creatures:Creature[], deleted:boolean[]) : void {
   p.fill(255)
   p.noStroke()
   p.rect(0, 0, 605, 610)
@@ -67,12 +68,12 @@ function drawGrid(creatures:Creature[], deleted:boolean[]) : void {
       p.noFill()
       p.stroke(del ? 225 : 0)
       p.rect(x, y, 50, 50)
-      cr.display(x + 5, y + 5, 40, del)
+      cr.display(p, x + 5, y + 5, 40, del)
     }
   }
 }
 
-function drawHeading(generation:number, action:Action) {
+function drawHeading(p:p5, generation:number, action:Action) {
   p.fill(255)
   p.noStroke()
   p.rect(605, 5, 190, 25)
@@ -85,7 +86,7 @@ function drawHeading(generation:number, action:Action) {
   p.text('Generation ' + generation + state, 610, 25)
 }
 
-function drawStatistics(creatures:Creature[]) : void {
+function drawStatistics(p:p5, creatures:Creature[]) : void {
   const st = getStatistics(creatures)
   p.fill(255)
   p.noStroke()
@@ -103,20 +104,20 @@ function drawStatistics(creatures:Creature[]) : void {
     `, 610, 47)
 }
 
-function getCreature(creatures:Creature[]) : Creature|null {
+function getCreature(p:p5, creatures:Creature[]) : Creature|null {
   if(p.mouseX < 610) {
-    const i = p.constrain(p.floor((p.mouseY - 5) / 60), 0, 9)
-    const j = p.constrain(p.floor((p.mouseX - 5) / 60), 0, 9)
+    const i = constrain(Math.floor((p.mouseY - 5) / 60), 0, 9)
+    const j = constrain(Math.floor((p.mouseX - 5) / 60), 0, 9)
     return creatures[i * 10 + j]
   }
   return null
 }
 
-function drawCreatureData(creatures:Creature[]) : void {
+function drawCreatureData(p:p5, creatures:Creature[]) : void {
   p.fill(255)
   p.noStroke()
   p.rect(605, 145, 190, 70)
-  const cr = getCreature(creatures)
+  const cr = getCreature(p, creatures)
   if(cr !== null) {
     p.fill(0)
     p.textSize(12)
@@ -129,7 +130,7 @@ function drawCreatureData(creatures:Creature[]) : void {
   }
 }
 
-function drawCreature(cr:Creature) : void {
+function drawCreature(p:p5, cr:Creature) : void {
   p.background(255)
   p.stroke(225)
   for(let x = 10; x < p.width; x += 30) {
@@ -140,6 +141,6 @@ function drawCreature(cr:Creature) : void {
   }
   const x = p.width / 2 - gen.creatureSize / 2
   const y = p.height / 2 - gen.creatureSize / 2
-  cr.display(x, y, gen.creatureSize, false)
+  cr.display(p, x, y, gen.creatureSize, false)
   cr.update()
 }

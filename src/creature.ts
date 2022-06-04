@@ -1,7 +1,7 @@
 import clone from 'clone'
 import p5 from 'p5'
 
-import { p, env, gen, mut } from './global'
+import { env, gen, mut, randomInt } from './global'
 import { Particle, randomForce, randomParticle, mutateParticle } from './particle'
 
 const next = {
@@ -31,7 +31,7 @@ export default class Creature {
   }
 
   static random() : Creature {
-    const n = p.floor(p.random(gen.minParticles, gen.maxParticles + 1))
+    const n = randomInt(gen.minParticles, gen.maxParticles + 1)
     const particles:Particle[] = Array.from({ length:n }, () => randomParticle(n))
     const domain = next.domain++
     const phylum = next.phylum++
@@ -42,13 +42,13 @@ export default class Creature {
     const particles = cr.particles.map((pt:Particle) =>
       mutateParticle(pt))
     let newPhylum = false
-    if(p.random() < mut.deletionProb && particles.length > gen.minParticles) {
-      const index = p.floor(p.random(particles.length))
+    if(Math.random() < mut.deletionProb && particles.length > gen.minParticles) {
+      const index = randomInt(0, particles.length)
       particles.splice(index, 1)
       particles.forEach((pt:Particle) => pt.forces.splice(index, 1))
       newPhylum = true
     }
-    if(p.random() < mut.additionProb && particles.length < gen.maxParticles) {
+    if(Math.random() < mut.additionProb && particles.length < gen.maxParticles) {
       const newPt = randomParticle(particles.length + 1)
       particles.forEach((pt:Particle) => pt.forces.push(randomForce()))
       particles.push(newPt)
@@ -67,7 +67,7 @@ export default class Creature {
     const accelerations:p5.Vector[] = []
     for(let i = 0; i < this.trialParticles.length; i++) {
       const pt = this.trialParticles[i]
-      const acc = p.createVector(0, 0)
+      const acc = new p5.Vector(0, 0)
       for(let j = 0; j < this.trialParticles.length; j++) {
         if(i === j) continue
         const pt2 = this.trialParticles[j]
@@ -90,7 +90,7 @@ export default class Creature {
     }
   }
 
-  display(x:number, y:number, size:number, deleted:boolean) : void {
+  display(p:p5, x:number, y:number, size:number, deleted:boolean) : void {
     const scale = size / gen.creatureSize
     this.trialParticles.forEach((pt:Particle) => {
       p.fill(deleted ? 225 : 0)
