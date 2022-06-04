@@ -137,6 +137,8 @@ function drawCreature(cr:Creature) : void {
   for(let y = 20; y < p.width; y += 30) {
     p.line(0, y, p.width, y)
   }
-  cr.display(p.width / 2, p.height / 2, gen.creatureSize, false)
+  const x = p.width / 2 - gen.creatureSize / 2
+  const y = p.height / 2 - gen.creatureSize / 2
+  cr.display(x, y, gen.creatureSize, false)
   cr.update()
 }

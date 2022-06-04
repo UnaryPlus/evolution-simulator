@@ -12,6 +12,7 @@ function sketch(instance:p5) {
   let deleted:boolean[]
   let mainButton:p5.Element
   let backButton:p5.Element
+  let resetButton:p5.Element
   let action:Action
   let zoomed:Creature|null = null
   let generation:number = 0
@@ -36,11 +37,17 @@ function sketch(instance:p5) {
     mainButton.elt.onselectstart = () => false
     action = 'sort'
 
-    backButton = p.createButton("←")
+    backButton = p.createButton("Back")
     backButton.position(20, 20)
     backButton.mouseClicked(backClicked)
     backButton.elt.onselectstart = () => false
     backButton.hide()
+
+    resetButton = p.createButton("Reset")
+    resetButton.position(75, 20)
+    resetButton.mouseClicked(resetClicked)
+    resetButton.elt.onselectstart = () => false
+    resetButton.hide()
 
     drawGrid(creatures, deleted)
     drawHeading(generation, action)
@@ -62,6 +69,7 @@ function sketch(instance:p5) {
       if(zoomed !== null) {
         mainButton.hide()
         backButton.show()
+        resetButton.show()
       }
     }
   }
@@ -93,11 +101,16 @@ function sketch(instance:p5) {
     if(zoomed !== null) zoomed.reset()
     zoomed = null
     backButton.hide()
+    resetButton.hide()
     mainButton.show()
     p.background(255)
     drawGrid(creatures, deleted)
     drawHeading(generation, action)
     drawStatistics(creatures)
+  }
+
+  function resetClicked() : void {
+    if(zoomed !== null) zoomed.reset()
   }
 }
 

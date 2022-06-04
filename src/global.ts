@@ -10,7 +10,7 @@ function setInstance(instance:p5) : void {
 
 const env = {
   friction:0.01,
-  massPower:2
+  massPower:1.5
 }
 
 const gen = {
