@@ -1,4 +1,4 @@
-export { Action, sortByFitness, filterGradient, killPhylum, createOffspring }
+export { Action, sortByFitness, filterGradient, killPhylum, createOffspring, alienInvasion }
 
 import Creature from './creature'
 
@@ -44,6 +44,14 @@ function createOffspring(creatures:Creature[], deleted:boolean[]) : Creature[] {
           return offspring
         }
       }
+    }
+  }
+}
+
+function alienInvasion(creatures:Creature[], deleted:boolean[]) : void {
+  for(let i = 0; i < creatures.length; i++) {
+    if(deleted[i]) {
+      creatures[i] = Creature.random()
     }
   }
 }

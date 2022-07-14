@@ -2,7 +2,7 @@ import p5 from 'p5'
 
 import Creature from './creature'
 import { drawGrid, drawHeading, drawStatistics, getCreature, drawCreatureData, drawCreature } from './view'
-import { Action, sortByFitness, filterGradient, killPhylum, createOffspring } from './action'
+import { Action, sortByFitness, filterGradient, killPhylum, createOffspring, alienInvasion } from './action'
 
 function sketch(p:p5) {
   let creatures:Creature[]
@@ -10,9 +10,10 @@ function sketch(p:p5) {
 
   let mainButton:p5.Element
   let skipButton:p5.Element
+  let killButton:p5.Element
+  let alienButton:p5.Element
   let backButton:p5.Element
   let resetButton:p5.Element
-  let killButton:p5.Element
   let phylumSearch:p5.Element
 
   let action:Action
@@ -43,11 +44,12 @@ function sketch(p:p5) {
     mainButton = createButton("Sort by fitness", 620, 300, mainClicked)
     skipButton = createButton("Skip 10 generations", 620, 340, skipClicked)
     killButton = createButton("Mass extinction", 620, 340, killClicked).hide()
+    alienButton = createButton("Alien invasion", 620, 340, alienClicked).hide()
     backButton = createButton("Back", 20, 20, backClicked).hide()
     resetButton = createButton("Reset", 75, 20, resetClicked).hide()
 
     phylumSearch = p.createInput("", "number")
-    phylumSearch.position(620, 380)
+    phylumSearch.position(620, 380).size(170)
     // @ts-ignore
     phylumSearch.input(() => drawGrid(p, creatures, deleted, phylumSearch.value()))
     phylumSearch.elt.placeholder = "Phylum"
@@ -92,6 +94,7 @@ function sketch(p:p5) {
     else if(action === 'filter') {
       deleted = filterGradient(creatures)
       killButton.hide()
+      alienButton.show()
       mainButton.html('Create offspring')
       action = 'create'
     }
@@ -99,6 +102,7 @@ function sketch(p:p5) {
       creatures = createOffspring(creatures, deleted)
       deleted = Array.from({ length:100 }, () => false)
       generation += 1
+      alienButton.hide()
       skipButton.show()
       mainButton.html('Sort by fitness')
       action = 'sort'
@@ -126,9 +130,23 @@ function sketch(p:p5) {
     if(del !== null) {
       deleted = del
       killButton.hide()
+      alienButton.show()
       mainButton.html('Create offspring')
       action = 'create'
     }
+    drawGrid(p, creatures, deleted, phylumSearch.value())
+    drawHeading(p, generation, action)
+  }
+
+  function alienClicked() : void {
+    alienInvasion(creatures, deleted)
+    deleted = Array.from({ length:100 }, () => false)
+    generation += 1
+    alienButton.hide()
+    skipButton.show()
+    mainButton.html('Sort by fitness')
+    action = 'sort'
+    drawStatistics(p, creatures)
     drawGrid(p, creatures, deleted, phylumSearch.value())
     drawHeading(p, generation, action)
   }
