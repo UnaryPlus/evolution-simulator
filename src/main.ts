@@ -83,6 +83,27 @@ function sketch(p:p5) {
     }
   }
 
+  function setCreate() : void {
+    killButton.hide()
+    alienButton.show()
+    mainButton.html('Create offspring')
+    action = 'create'
+    drawGrid(p, creatures, deleted, phylumSearch.value())
+    drawHeading(p, generation, action)
+  }
+
+  function nextGen() : void {
+    deleted = Array.from({ length:100 }, () => false)
+    generation += 1
+    alienButton.hide()
+    skipButton.show()
+    mainButton.html('Sort by fitness')
+    action = 'sort'
+    drawGrid(p, creatures, deleted, phylumSearch.value())
+    drawHeading(p, generation, action)
+    drawStatistics(p, creatures)
+  }
+
   function mainClicked() : void {
     if(action === 'sort') {
       sortByFitness(creatures)
@@ -90,26 +111,17 @@ function sketch(p:p5) {
       killButton.show()
       mainButton.html('Filter population')
       action = 'filter'
+      drawGrid(p, creatures, deleted, phylumSearch.value())
+      drawHeading(p, generation, action)
     }
     else if(action === 'filter') {
       deleted = filterGradient(creatures)
-      killButton.hide()
-      alienButton.show()
-      mainButton.html('Create offspring')
-      action = 'create'
+      setCreate()
     }
     else if(action === 'create') {
       creatures = createOffspring(creatures, deleted)
-      deleted = Array.from({ length:100 }, () => false)
-      generation += 1
-      alienButton.hide()
-      skipButton.show()
-      mainButton.html('Sort by fitness')
-      action = 'sort'
-      drawStatistics(p, creatures)
+      nextGen()
     }
-    drawGrid(p, creatures, deleted, phylumSearch.value())
-    drawHeading(p, generation, action)
   }
 
   function skipClicked() : void {
@@ -129,26 +141,13 @@ function sketch(p:p5) {
     const del = killPhylum(creatures, phylumSearch.value())
     if(del !== null) {
       deleted = del
-      killButton.hide()
-      alienButton.show()
-      mainButton.html('Create offspring')
-      action = 'create'
+      setCreate()
     }
-    drawGrid(p, creatures, deleted, phylumSearch.value())
-    drawHeading(p, generation, action)
   }
 
   function alienClicked() : void {
     alienInvasion(creatures, deleted)
-    deleted = Array.from({ length:100 }, () => false)
-    generation += 1
-    alienButton.hide()
-    skipButton.show()
-    mainButton.html('Sort by fitness')
-    action = 'sort'
-    drawStatistics(p, creatures)
-    drawGrid(p, creatures, deleted, phylumSearch.value())
-    drawHeading(p, generation, action)
+    nextGen()
   }
 
   function backClicked() : void {
