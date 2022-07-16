@@ -1,8 +1,8 @@
 export { Particle, randomForce, randomParticle, mutateParticle }
 
-import p5 from 'p5'
+import p5 from "p5"
 
-import { gen, mut, random, randomGaussian, constrain } from './global'
+import { gen, mut, random, randomGaussian, constrain } from "./global"
 
 type Force = {
   minRadius:number,

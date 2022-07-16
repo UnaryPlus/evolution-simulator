@@ -3,8 +3,91 @@
   <head>
     <meta charset="utf-8">
     <title>Particle Evolution</title>
+
+    <style>
+      #config {
+        box-sizing: border-box;
+        width: 802px;
+        height: 614px;
+        padding: 20px;
+        border: 1px solid black;
+        line-height: 1.5em;
+      }
+      #config div {
+        margin-bottom: 20px;
+      }
+      #config input[type="number"] {
+        width: 100px;
+      }
+      #game {
+        display: inline-block;
+        position: relative;
+      }
+    </style>
   </head>
   <body>
+    <form id="config">
+      <div id="launch">
+        <input type="submit" value="Launch simulator">
+      </div>
+
+      <div id="env">
+        <b>Environment/friction constants</b><br>
+        <label for="env-friction">Friction:</label>
+        <input type="number" id="env-friction" name="env-friction" value="0.01" step="any" required><br>
+        <label for="env-mass-power">Mass exponent:</label>
+        <input type="number" id="env-mass-power" name="env-mass-power" value="1.85" step="any" required><br>
+        <label for="env-trial-time">Trial time:</label>
+        <input type="number" id="env-trial-time" name="env-trial-time" value="600" required>
+      </div>
+
+      <div id="gen">
+        <b>Creature generation constants</b><br>
+        <label for="gen-creature-size">Creature size:</label>
+        <input type="number" id="gen-creature-size" name="gen-creature-size" value="100" required><br>
+        <label for="gen-min-particles">Num particles (min):</label>
+        <input type="number" id="gen-min-particles" name="gen-min-particles" value="3" required>
+        <label for="gen-max-particles">(max):</label>
+        <input type="number" id="gen-max-particles" name="gen-max-particles" value="10" required><br>
+        <label for="gen-min-radius-min">Min force radius (min):</label>
+        <input type="number" id="gen-min-radius-min" name="gen-min-radius-min" value="15" step="any" required>
+        <label for="gen-min-radius-max">(max):</label>
+        <input type="number" id="gen-min-radius-max" name="gen-min-radius-max" value="30" step="any" required><br>
+        <label for="gen-max-radius-min">Max force radius (min):</label>
+        <input type="number" id="gen-max-radius-min" name="gen-max-radius-min" value="30" step="any" required>
+        <label for="gen-max-radius-max">(max):</label>
+        <input type="number" id="gen-max-radius-max" name="gen-max-radius-max" value="100" step="any" required><br>
+        <label for="gen-attraction-mean">Attraction (mean):</label>
+        <input type="number" id="gen-attraction-mean" name="gen-attraction-mean" value="0.2" step="any" required>
+        <label for="gen-attraction-std">(std):</label>
+        <input type="number" id="gen-attraction-std" name="gen-attraction-std" value="0.2" step="any" required>
+      </div>
+
+      <div id="mut">
+        <b>Mutation constants</b><br>
+        <label for="mut-position-prob">Particle position (prob):</label>
+        <input type="number" id="mut-position-prob" name="mut-position-prob" value="0.1" step="any" required>
+        <label for="mut-position-std">(std):</label>
+        <input type="number" id="mut-position-std" name="mut-position-std" value="3" step="any" required><br>
+        <label for="mut-min-radius-prob">Min force radius (prob):</label>
+        <input type="number" id="mut-min-radius-prob" name="mut-min-radius-prob" value="0.05" step="any" required>
+        <label for="mut-min-radius-std">(std):</label>
+        <input type="number" id="mut-min-radius-std" name="mut-min-radius-std" value="3" step="any" required><br>
+        <label for="mut-max-radius-prob">Max force radius (prob):</label>
+        <input type="number" id="mut-max-radius-prob" name="mut-max-radius-prob" value="0.05" step="any" required>
+        <label for="mut-max-radius-std">(std):</label>
+        <input type="number" id="mut-max-radius-std" name="mut-max-radius-std" value="5" step="any" required><br>
+        <label for="mut-attraction-prob">Attraction (prob):</label>
+        <input type="number" id="mut-attraction-prob" name="mut-attraction-prob" value="0.05" step="any" required>
+        <label for="mut-attraction-std">(std):</label>
+        <input type="number" id="mut-attraction-std" name="mut-attraction-std" value="0.1" step="any" required><br>
+        <label for="mut-deletion-prob">Particle deletion (prob):</label>
+        <input type="number" id="mut-deletion-prob" name="mut-deletion-prob" value="0.05" step="any" required><br>
+        <label for="mut-addition-prob">Particle addition (prob):</label>
+        <input type="number" id="mut-addition-prob" name="mut-addition-prob" value="0.05" step="any" required>
+      </div>
+    </form>
+
     <div id="game"></div>
     <script src="game.js"></script>
   </body>

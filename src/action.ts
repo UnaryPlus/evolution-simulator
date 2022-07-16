@@ -1,8 +1,8 @@
 export { Action, sortByFitness, filterGradient, killPhylum, createOffspring, alienInvasion }
 
-import Creature from './creature'
+import Creature from "./creature"
 
-type Action = 'sort' | 'filter' | 'create'
+type Action = "sort" | "filter" | "create"
 
 function sortByFitness(creatures:Creature[]) : void {
   creatures.sort((cr1:Creature, cr2:Creature) => cr2.fitness - cr1.fitness)
@@ -19,7 +19,7 @@ function filterGradient(creatures:Creature[]) : boolean[] {
 
 function killPhylum(creatures:Creature[], phylum:string|number) : null|boolean[] {
   const phy:number =
-      phylum === '' ? -1
+      phylum === "" ? -1
     : isNaN(+phylum) ? -1
     : +phylum
   const deleted:boolean[] = []

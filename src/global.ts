@@ -1,4 +1,4 @@
-export { env, gen, mut, random, randomInt, randomGaussian, constrain }
+export { env, gen, mut, setConstants, random, randomInt, randomGaussian, constrain }
 
 const env = {
   friction:0.01,
@@ -7,9 +7,9 @@ const env = {
 }
 
 const gen = {
+  creatureSize:100,
   minParticles:3,
   maxParticles:10,
-  creatureSize:100,
   minRadiusMin:15,
   minRadiusMax:30,
   maxRadiusMin:30,
@@ -29,6 +29,39 @@ const mut = {
   attractionStd:0.1,
   deletionProb:0.05,
   additionProb:0.05
+}
+
+function setConstants() : void {
+  function v(id:string) : number {
+    const el = document.getElementById(id) as HTMLInputElement
+    if(el === null) throw `element "${id}" does not exist`
+    if(el.value === null || el.value === "" || isNaN(+el.value)) {
+      throw `invalid value for element ${id}`
+    }
+    return +el.value
+  }
+  env.friction = v("env-friction")
+  env.massPower = v("env-mass-power")
+  env.trialTime = v("env-trial-time")
+  gen.creatureSize = v("gen-creature-size")
+  gen.minParticles = v("gen-min-particles")
+  gen.maxParticles = v("gen-max-particles")
+  gen.minRadiusMin = v("gen-min-radius-min")
+  gen.minRadiusMax = v("gen-min-radius-max")
+  gen.maxRadiusMin = v("gen-max-radius-min")
+  gen.maxRadiusMax = v("gen-max-radius-max")
+  gen.attractionMean = v("gen-attraction-mean")
+  gen.attractionStd = v("gen-attraction-std")
+  mut.positionProb = v("mut-position-prob")
+  mut.positionStd = v("mut-position-std")
+  mut.minRadiusProb = v("mut-min-radius-prob")
+  mut.minRadiusStd = v("mut-min-radius-std")
+  mut.maxRadiusProb = v("mut-max-radius-prob")
+  mut.maxRadiusStd = v("mut-max-radius-std")
+  mut.attractionProb = v("mut-attraction-prob")
+  mut.attractionStd = v("mut-attraction-std")
+  mut.deletionProb = v("mut-deletion-prob")
+  mut.additionProb = v("mut-addition-prob")
 }
 
 function random(min:number, max:number) : number {

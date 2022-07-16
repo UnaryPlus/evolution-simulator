@@ -1,11 +1,11 @@
 export { drawGrid, drawHeading, drawStatistics, getCreature, drawCreatureData, drawCreature }
 
-import { stripIndent } from 'common-tags'
-import p5 from 'p5'
+import { stripIndent } from "common-tags"
+import p5 from "p5"
 
-import { gen, constrain } from './global'
-import Creature from './creature'
-import { Action } from './action'
+import { gen, constrain } from "./global"
+import Creature from "./creature"
+import { Action } from "./action"
 
 type Statistics = {
   meanFitness:number,
@@ -57,7 +57,7 @@ function getStatistics(creatures:Creature[]) : Statistics {
 
 function drawGrid(p:p5, creatures:Creature[], deleted:boolean[], phylum:string|number) : void {
   const phy:number =
-      phylum === '' ? -1
+      phylum === "" ? -1
     : isNaN(+phylum) ? -1
     : +phylum
   p.fill(255)
@@ -93,10 +93,10 @@ function drawHeading(p:p5, generation:number, action:Action) {
   p.fill(0)
   p.textSize(16)
   const state:string =
-    action === 'sort' ? ''
-    : action === 'filter' ? ' (sorted)'
-    : ' (filtered)'
-  p.text('Generation ' + generation + state, 610, 25)
+    action === "sort" ? ""
+    : action === "filter" ? " (sorted)"
+    : " (filtered)"
+  p.text("Generation " + generation + state, 610, 25)
 }
 
 function drawStatistics(p:p5, creatures:Creature[]) : void {

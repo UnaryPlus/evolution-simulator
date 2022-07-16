@@ -1,8 +1,8 @@
-import clone from 'clone'
-import p5 from 'p5'
+import clone from "clone"
+import p5 from "p5"
 
-import { env, gen, mut, randomInt } from './global'
-import { Particle, randomForce, randomParticle, mutateParticle } from './particle'
+import { env, gen, mut, randomInt } from "./global"
+import { Particle, randomForce, randomParticle, mutateParticle } from "./particle"
 
 const next = {
   domain:0,
