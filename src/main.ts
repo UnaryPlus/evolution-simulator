@@ -25,6 +25,7 @@ let generation:number = 0
 function createButton(text:string, x:number, y:number, callback : () => void) : p5.Element{
   const button = p.createButton(text)
   button.parent("game")
+  button.class("override")
   button.position(x, y)
   button.mouseClicked(callback)
   button.elt.onselectstart = () => false
