@@ -9,7 +9,7 @@ An interactive program that demonstrates how a population can evolve over time.
 
 The population in each generation consists of 100 "creatures". A creature is simply a collection of particles, along with a set of rules for how those particles interact over time. Specifically, for each ordered pair _(P, Q)_ of distinct particles, there is a minimum radius _r<sub>0</sub>_, a maximum radius _r<sub>1</sub>_, and an attraction _a_. If the distance between _P_ and _Q_ is greater than _r<sub>0</sub>_ but less than _r<sub>1</sub>_, then particle _P_ will accelerate in the direction of particle _Q_ with magnitude _a_. The total acceleration of particle _P_ at any point in time is simply the sum of all such acceleration vectors, and likewise for the other particles.
 
-The evolutionary fitness of a creature is defined as _n / (p<sup>x</sup)_, where _n_ is the total number of particle interactions over the course of ten seconds, _p_ is the number of particles in the creature, and _x_ is a constant, set to 1.85 by default. (_x_ is called the "mass exponent"; you can change it before launching the simulation.) Higher values of _x_ tend to favor small creatures, and lower values of _x_ tend to favor large creatures.
+The evolutionary fitness of a creature is defined as _n / (p<sup>x</sup>)_, where _n_ is the total number of particle interactions over the course of ten seconds, _p_ is the number of particles in the creature, and _x_ is a constant, set to 1.85 by default. (_x_ is called the "mass exponent"; you can change it before launching the simulation.) Higher values of _x_ tend to favor small creatures, and lower values of _x_ tend to favor large creatures.
 
 ## Generations
 
